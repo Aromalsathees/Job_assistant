@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'applications.apps.ApplicationsConfig',
     'user_preferences.apps.UserPreferencesConfig',
     'discovery_runs.apps.DiscoveryRunsConfig',
+     
+    #agent
+    'support'
 ]
 
 MIDDLEWARE = [
