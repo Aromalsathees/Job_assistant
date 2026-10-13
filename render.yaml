@@ -1,0 +1,36 @@
+services:
+  # Web Service: Django REST Backend
+  - type: web
+    name: south-india-job-agent-backend
+    env: python
+    buildCommand: "pip install -r backend/requirements.txt && python backend/manage.py collectstatic --noinput && python backend/manage.py migrate"
+    startCommand: "gunicorn --chdir backend core.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: south-india-job-agent-db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: "*"
+
+  # Static Web Service: React Frontend
+  - type: web
+    name: south-india-job-agent-frontend
+    env: static
+    buildCommand: "cd frontend && npm install && npm run build"
+    staticPublishPath: "frontend/dist"
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"
+
+databases:
+  # Managed PostgreSQL Database
+  - name: south-india-job-agent-db
+    plan: free
+    databaseName: south_india_job_agent
+    user: postgres
